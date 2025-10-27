@@ -21,6 +21,7 @@
 		<ProjectReference Include="..\BTCPayServer.Lightning.LNbank\BTCPayServer.Lightning.LNbank.csproj" />
 		<ProjectReference Include="..\BTCPayServer.Lightning.LNDhub\BTCPayServer.Lightning.LNDhub.csproj" />
 		<ProjectReference Include="..\BTCPayServer.Lightning.LND\BTCPayServer.Lightning.LND.csproj" />
+		<ProjectReference Include="..\BTCPayServer.Lightning.LNbits\BTCPayServer.Lightning.LNbits.csproj" />
 	</ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2"></PackageReference>
