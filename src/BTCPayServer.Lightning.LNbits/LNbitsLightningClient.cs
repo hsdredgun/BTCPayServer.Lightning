@@ -84,7 +84,6 @@ namespace BTCPayServer.Lightning.LNbits
             return await GetInvoice(paymentHash.ToString(), cancellation);
         }
 
-        // Stub methods - implement the interface
         public Task<LightningInvoice> CreateInvoice(CreateInvoiceParams createInvoiceRequest, CancellationToken cancellation = default)
         {
             return CreateInvoice(createInvoiceRequest.Amount, createInvoiceRequest.Description, createInvoiceRequest.Expiry, cancellation);
@@ -120,9 +119,26 @@ namespace BTCPayServer.Lightning.LNbits
             throw new NotImplementedException();
         }
 
-        public Task<LightningNodeInformation> GetInfo(CancellationToken cancellation = default)
+        public async Task<LightningNodeInformation> GetInfo(CancellationToken cancellation = default)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var response = await _httpClient.GetAsync("/api/v1/wallet", cancellation);
+                response.EnsureSuccessStatusCode();
+
+                var walletInfo = await response.Content.ReadFromJsonAsync<LNbitsWalletResponse>(cancellationToken: cancellation);
+
+                return new LightningNodeInformation
+                {
+                    Alias = walletInfo?.name ?? "LNbits Wallet",
+                    BlockHeight = 0,
+                    NodeInfoList = Array.Empty<NodeInfo>()
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to get wallet info: {ex.Message}", ex);
+            }
         }
 
         public Task<LightningNodeBalance> GetBalance(CancellationToken cancellation = default)
@@ -170,7 +186,6 @@ namespace BTCPayServer.Lightning.LNbits
             return Task.FromResult(Array.Empty<LightningChannel>());
         }
 
-        // API Response Models
         private class LNbitsInvoiceResponse
         {
             public string payment_hash { get; set; }
@@ -184,6 +199,13 @@ namespace BTCPayServer.Lightning.LNbits
             public long amount { get; set; }
             public string bolt11 { get; set; }
             public long time { get; set; }
+        }
+
+        private class LNbitsWalletResponse
+        {
+            public string id { get; set; }
+            public string name { get; set; }
+            public long balance { get; set; }
         }
     }
 }
