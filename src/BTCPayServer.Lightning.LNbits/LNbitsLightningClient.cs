@@ -141,9 +141,31 @@ namespace BTCPayServer.Lightning.LNbits
             }
         }
 
-        public Task<LightningNodeBalance> GetBalance(CancellationToken cancellation = default)
+        public async Task<LightningNodeBalance> GetBalance(CancellationToken cancellation = default)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var response = await _httpClient.GetAsync("/api/v1/wallet", cancellation);
+                response.EnsureSuccessStatusCode();
+                
+                var walletInfo = await response.Content.ReadFromJsonAsync<LNbitsWalletResponse>(cancellationToken: cancellation);
+                
+                return new LightningNodeBalance
+                {
+                    OnchainBalance = null,
+                    OffchainBalance = new OffchainBalance
+                    {
+                        Opening = LightMoney.Zero,
+                        Local = LightMoney.MilliSatoshis(walletInfo?.balance ?? 0),
+                        Remote = LightMoney.Zero,
+                        Closing = LightMoney.Zero
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to get balance: {ex.Message}", ex);
+            }
         }
 
         public Task<PayResponse> Pay(PayInvoiceParams payParams, CancellationToken cancellation = default)
