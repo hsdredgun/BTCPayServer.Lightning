@@ -131,7 +131,7 @@ namespace BTCPayServer.Lightning.LNbits
                 return new LightningNodeInformation
                 {
                     Alias = walletInfo?.name ?? "LNbits Wallet",
-                    BlockHeight = 0
+                    BlockHeight = int.MaxValue
                 };
             }
             catch (Exception ex)
